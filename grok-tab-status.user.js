@@ -3,7 +3,7 @@
 // @name:zh-TW   Grok 分頁狀態
 // @name:zh-CN   Grok 标签页状态
 // @namespace    https://github.com/endman100
-// @version      0.1.0
+// @version      0.1.1
 // @description  Show Grok execution state in the browser tab title.
 // @description:zh-TW 在瀏覽器分頁標題顯示 Grok 的 IDLE / THINKING / TOOL / WRITING / DONE 執行狀態。
 // @description:zh-CN 在浏览器标签页标题显示 Grok 的 IDLE / THINKING / TOOL / WRITING / DONE 执行状态。
@@ -24,7 +24,7 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.1.0';
+  const VERSION = '0.1.1';
   const PREFIX_RE = /^\[(?:THINKING|TOOL|WRITING|DONE|IDLE)\]\s*/;
   const POLL_MS = 250;
   const ACTIVITY_LATCH_MS = 2500;
@@ -119,7 +119,7 @@
     const testId = el.getAttribute('data-testid') || '';
     if (testId === 'chat-stop' || testId === 'chat-stop-button') return true;
     const label = `${el.getAttribute('aria-label') || ''} ${el.getAttribute('title') || ''}`;
-    if (/(?:Stop generating|Stop response|停止生成|停止回應|停止响应)/i.test(label)) return true;
+    if (/(?:Stop generating|Stop response|停止模型|停止生成|停止回應|停止响应|停止)/i.test(label)) return true;
     if (/^Stop$/i.test((el.getAttribute('aria-label') || '').trim())) {
       return Boolean(
         el.closest('[data-testid="chat-input"]') ||
@@ -129,9 +129,17 @@
     return false;
   }
 
+  function hasWorkingIndicator() {
+    const nodes = document.querySelectorAll(
+      '[data-testid="canvas-working-indicator"], [data-testid*="working-indicator" i]'
+    );
+    return [...nodes].some((el) => visible(el));
+  }
+
   function running() {
     const stops = queryAll(STOP_SELECTORS).filter((el) => isStopControl(el) && visible(el));
     if (stops.length) return true;
+    if (hasWorkingIndicator()) return true;
     const streaming = document.querySelector('[data-streaming="true"], [data-is-streaming="true"]');
     if (streaming && visible(streaming)) return true;
     return false;

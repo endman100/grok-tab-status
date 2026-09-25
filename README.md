@@ -78,7 +78,7 @@ Grok's web UI is not a stable public API. DOM attributes and labels can change, 
 
 ## Current version
 
-`0.1.0`
+`0.1.1`
 
 ## License
 
